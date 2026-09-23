@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Roots Study Games</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style id="app-style">
+:root{
+  --green:#1F5A40; --green-deep:#154230; --paper:#FFFFFF; --page:#EAF2EC;
+  --ink:#17231D; --muted:#56675D; --sun:#F5C542; --sun-soft:#FFF3C9;
+  --line:#C9D8CD; --good:#2E8B57; --good-soft:#D6F0E0; --bad:#C2413A; --bad-soft:#F8DEDC;
+  --shadow:0 2px 0 #C9D8CD;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --green:#58B386; --green-deep:#1C3A2C; --paper:#1E2A24; --page:#121A16;
+    --ink:#EAF2EC; --muted:#A3B5AA; --sun:#F5C542; --sun-soft:#3A3319;
+    --line:#2F4238; --good:#5FCB8E; --good-soft:#1F3B2B; --bad:#EF7A72; --bad-soft:#3E2220;
+    --shadow:0 2px 0 #0A100D; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --green:#58B386; --green-deep:#1C3A2C; --paper:#1E2A24; --page:#121A16;
+  --ink:#EAF2EC; --muted:#A3B5AA; --sun:#F5C542; --sun-soft:#3A3319;
+  --line:#2F4238; --good:#5FCB8E; --good-soft:#1F3B2B; --bad:#EF7A72; --bad-soft:#3E2220;
+  --shadow:0 2px 0 #0A100D; color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--page);color:var(--ink);font-family:"Lexend",system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.wrap{max-width:760px;margin:0 auto;padding:20px 16px 48px}
+
+header.top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+h1{font-size:clamp(1.6rem,5vw,2.3rem);font-weight:800;line-height:1.1;margin:0;letter-spacing:-0.01em}
+h1 span{display:block;font-size:.95rem;font-weight:500;color:var(--muted);letter-spacing:0;margin-top:4px}
+
+nav.tabs{display:flex;gap:6px;background:var(--paper);border:2px solid var(--line);border-radius:14px;padding:5px;margin-bottom:22px}
+nav.tabs button{flex:1;border:0;background:transparent;padding:10px 8px;border-radius:10px;font-weight:700;font-size:.95rem;color:var(--muted)}
+nav.tabs button[aria-selected="true"]{background:var(--green);color:#fff}
+:root[data-theme="dark"] nav.tabs button[aria-selected="true"]{color:#0E1A14}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) nav.tabs button[aria-selected="true"]{color:#0E1A14}}
+
+section[hidden]{display:none}
+.voice-pick{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.voice-pick .vlabel{font-size:.85rem;font-weight:700;color:var(--muted)}
+.seg{display:inline-flex;background:var(--paper);border:2px solid var(--line);border-radius:12px;padding:4px;gap:4px}
+.seg button{border:0;background:transparent;border-radius:9px;padding:8px 16px;font-weight:700;min-height:40px;color:var(--muted)}
+.seg button[aria-checked="true"]{background:var(--sun);color:#2A2205}
+
+/* Flashcards */
+.scene{perspective:1200px;margin:0 auto;max-width:560px}
+.card{position:relative;width:100%;aspect-ratio:5/3;min-height:220px;border:0;background:transparent;padding:0;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.3,.7,.2,1)}
+.card.flipped{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;border:2px solid var(--line);box-shadow:0 4px 0 var(--line)}
+.face.front{background:var(--paper)}
+.face.front::before{content:"";position:absolute;left:0;right:0;top:0;height:14px;background:var(--green);border-radius:16px 16px 0 0}
+.face.back{background:var(--sun-soft);transform:rotateY(180deg);border-color:var(--sun)}
+.face .root{font-size:clamp(2.2rem,9vw,3.6rem);font-weight:800;line-height:1.1;overflow-wrap:anywhere}
+.face .meaning{font-size:clamp(1.5rem,6vw,2.3rem);font-weight:500;line-height:1.2;overflow-wrap:anywhere}
+.face .hint{position:absolute;bottom:14px;font-size:.8rem;color:var(--muted)}
+.count{text-align:center;color:var(--muted);font-weight:500;margin:14px 0 4px}
+.controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+.btn{border:2px solid var(--line);background:var(--paper);border-radius:12px;padding:10px 16px;font-weight:700;box-shadow:var(--shadow);min-height:46px}
+.btn:active{transform:translateY(2px);box-shadow:none}
+.btn.primary{background:var(--green);border-color:var(--green);color:#fff}
+.btn.speak{background:var(--sun);border-color:var(--sun);color:#2A2205;display:inline-flex;align-items:center;gap:8px}
+.btn:disabled{opacity:.45;cursor:default}
+.speak svg{width:20px;height:20px}
+
+/* Matching */
+.match-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.stats{font-weight:500;color:var(--muted)}
+.stats b{color:var(--ink)}
+.timer-row{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.clock{flex:1;min-width:140px;background:var(--paper);border:2px solid var(--line);border-radius:14px;padding:10px 14px}
+.clock small{display:block;font-size:.8rem;font-weight:700;color:var(--muted)}
+.clock b{font-size:1.7rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.2}
+.clock.best{border-color:var(--sun);background:var(--sun-soft);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.resetBest{border:2px solid var(--sun);background:var(--paper);border-radius:10px;padding:6px 12px;font-weight:700;font-size:.85rem;min-height:40px}
+.resetBest:disabled{opacity:.4;cursor:default}
+.win .record{color:var(--good);font-size:1.5rem}
+.win .sub{font-size:1rem;font-weight:500;color:var(--muted)}
+.toggle{display:inline-flex;align-items:center;gap:8px;font-size:.9rem;font-weight:500;cursor:pointer}
+.toggle input{width:20px;height:20px;accent-color:var(--green)}
+.columns{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.col h2{font-size:.95rem;font-weight:700;color:var(--muted);margin:0 0 8px}
+.tile{display:block;width:100%;text-align:left;border:2px solid var(--line);background:var(--paper);border-radius:12px;padding:12px 14px;margin-bottom:8px;min-height:54px;box-shadow:var(--shadow);transition:background .15s,border-color .15s}
+.tile.rootTile{font-weight:800;font-size:1.1rem}
+.tile.selected{border-color:var(--sun);background:var(--sun-soft)}
+.tile.done{border-color:var(--good);background:var(--good-soft);color:var(--good);box-shadow:none;cursor:default}
+.tile.wrong{border-color:var(--bad);background:var(--bad-soft);animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.win{text-align:center;background:var(--paper);border:2px solid var(--good);border-radius:16px;padding:22px;margin-bottom:16px}
+.win p{margin:0 0 12px;font-size:1.25rem;font-weight:700}
+
+/* Editor */
+.edit-intro{color:var(--muted);margin:0 0 14px;max-width:60ch}
+.row{display:grid;grid-template-columns:1fr 1.4fr auto;gap:8px;align-items:center;margin-bottom:8px}
+.row input{width:100%;border:2px solid var(--line);background:var(--paper);border-radius:10px;padding:10px 12px;min-height:46px}
+.row input.r{font-weight:700}
+.row .del{border:2px solid var(--line);background:var(--paper);border-radius:10px;width:46px;height:46px;font-size:1.2rem;color:var(--bad)}
+.row-head{display:grid;grid-template-columns:1fr 1.4fr 46px;gap:8px;font-size:.85rem;font-weight:700;color:var(--muted);margin-bottom:6px}
+.field{display:block;margin-bottom:16px}
+.field span{display:block;font-size:.85rem;font-weight:700;color:var(--muted);margin-bottom:6px}
+.field input{width:100%;border:2px solid var(--line);background:var(--paper);border-radius:10px;padding:10px 12px;min-height:46px}
+.edit-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center}
+.status{font-size:.9rem;color:var(--muted);min-height:1.4em;margin-top:10px}
+.empty{background:var(--paper);border:2px dashed var(--line);border-radius:16px;padding:28px;text-align:center;color:var(--muted)}
+
+@media (max-width:520px){
+  .row{grid-template-columns:1fr 46px;}
+  .row input.m{grid-column:1 / 2}
+  .row .del{grid-row:1 / 3;grid-column:2;height:100%}
+  .row{padding-bottom:10px;border-bottom:1px solid var(--line);margin-bottom:10px}
+  .row-head{display:none}
+  .tile{padding:10px 11px;font-size:.92rem}
+  .tile.rootTile{font-size:1rem}
+}
+/* Tablet */
+@media (min-width:700px){
+  .wrap{max-width:900px;padding:28px 28px 56px}
+  .scene{max-width:680px}
+  .face .root{font-size:clamp(3rem,7vw,4.4rem)}
+  .face .meaning{font-size:clamp(2rem,4.5vw,2.8rem)}
+  .btn{padding:12px 20px;font-size:1.05rem;min-height:52px}
+  .columns{gap:20px}
+  .tile{padding:14px 18px;font-size:1.1rem;min-height:60px}
+  .tile.rootTile{font-size:1.25rem}
+  nav.tabs button{font-size:1.05rem;padding:12px}
+}
+/* Computer */
+@media (min-width:1100px){
+  .wrap{max-width:1080px;padding:36px 40px 64px}
+  .scene{max-width:780px}
+  .face .root{font-size:4.8rem}
+  .face .meaning{font-size:3rem}
+  .clock b{font-size:2rem}
+  .columns{gap:28px}
+  .tile{font-size:1.2rem;min-height:64px}
+  .tile.rootTile{font-size:1.35rem}
+  .row input{font-size:1.05rem}
+}
+/* Phone */
+@media (max-width:420px){
+  .wrap{padding:14px 12px 40px}
+  header.top{flex-direction:column;align-items:stretch}
+  .seg{flex:1}.seg button{flex:1}
+  .face{padding:18px}
+  .controls .btn{flex:1 1 auto}
+  .columns{gap:8px}
+  .clock b{font-size:1.4rem}
+}
+/* Short screens held sideways (phone landscape) */
+@media (max-height:500px) and (orientation:landscape){
+  .scene{max-width:420px}
+  .card{min-height:180px}
+}
+@media (prefers-reduced-motion: reduce){
+  .card{transition:none}
+  .tile.wrong{animation:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1 id="deckTitle">Roots</h1>
+    <div class="voice-pick" id="voicePick"></div>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-tab="flash">Flashcards</button>
+    <button role="tab" aria-selected="false" data-tab="match">Matching</button>
+    <button role="tab" aria-selected="false" data-tab="edit">Edit words</button>
+  </nav>
+
+  <section id="flash"></section>
+  <section id="match" hidden></section>
+  <section id="edit" hidden></section>
+</div>
+
+<script type="application/json" id="deck-data">{"title":"Greek and Latin Roots","cards":[{"root":"tele","meaning":"far away"},{"root":"phono","meaning":"sound, voice"},{"root":"peri","meaning":"around, near"},{"root":"graph, gram","meaning":"to write; or something written"},{"root":"scope","meaning":"watch, view, examine"},{"root":"micro","meaning":"small"},{"root":"geo","meaning":"earth"},{"root":"thermos, therm","meaning":"heat"},{"root":"meter, metry","meaning":"measure"},{"root":"bio","meaning":"life"}]}</script>
+
+<script id="app-script">
+(function(){
+  const SPEAKER = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
+  const LS_KEY = 'roots-deck-v1';
+
+  // ---------- data ----------
+  let deck;
+  try { deck = JSON.parse(document.getElementById('deck-data').textContent); }
+  catch(e){ deck = {title:'My roots', cards:[]}; }
+  try {
+    const saved = localStorage.getItem(LS_KEY);
+    if (saved && !window.__publishedFresh) {
+      const s = JSON.parse(saved);
+      if (s && s.stamp === deckStamp(deck) && s.deck) deck = s.deck;
+    }
+  } catch(e){}
+  function deckStamp(d){ return JSON.stringify(d).length + ':' + (d.cards||[]).length; }
+
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const shuffle = a => { a = a.slice(); for (let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
+
+  // ---------- speech ----------
+  // Female, clear-sounding voices, best first. Which ones exist depends on the device.
+  const FEMALE_PREFS = [
+    /aria.*(natural|online)/i, /jenny.*(natural|online)/i, /ava.*(natural|online|premium|enhanced)/i,
+    /samantha.*(premium|enhanced)/i, /allison.*(premium|enhanced)/i, /susan.*(premium|enhanced)/i,
+    /google us english/i, /samantha/i, /\bava\b/i, /allison/i, /\bsusan\b/i, /\bzira\b/i,
+    /\bjenny\b/i, /\baria\b/i, /victoria/i, /karen/i, /serena/i, /moira/i, /tessa/i, /fiona/i,
+    /google uk english female/i, /female/i, /woman/i
+  ];
+  const MALE_PREFS = [
+    /andrew.*(natural|online)/i, /guy.*(natural|online)/i, /christopher.*(natural|online)/i, /brian.*(natural|online)/i,
+    /(evan|tom|nathan|aaron).*(premium|enhanced)/i, /google uk english male/i, /\bdaniel\b/i, /\balex\b/i,
+    /\baaron\b/i, /\bdavid\b/i, /\bmark\b/i, /\bguy\b/i, /\bandrew\b/i, /\bfred\b/i, /\btom\b/i, /\brishi\b/i, /\bmale\b/i
+  ];
+  const MALE_HINT = /\b(male|david|mark|guy|daniel|alex|fred|tom|aaron|arthur|rishi|oliver|james|george|ryan|christopher|eric|roger|steffan|andrew|brian|evan|nathan)\b/i;
+  const VOICE_KEY = 'roots-voice-gender-v1';
+  let voices = [], femaleVoice = null, maleVoice = null, gender = 'female';
+  try { if (localStorage.getItem(VOICE_KEY) === 'male') gender = 'male'; } catch(e){}
+  function englishVoices(){ return (window.speechSynthesis ? speechSynthesis.getVoices() : []).filter(v => /^en/i.test(v.lang)); }
+  function findBy(prefs, list, ok){ for (const re of prefs){ const v = list.find(v => re.test(v.name) && ok(v)); if (v) return v; } return null; }
+  function loadVoices(){
+    voices = englishVoices();
+    const isMale = v => MALE_HINT.test(v.name.replace(/female/i,''));
+    femaleVoice = findBy(FEMALE_PREFS, voices, v => !isMale(v)) || voices.find(v => /en-US/i.test(v.lang) && !isMale(v)) || voices.find(v => !isMale(v)) || voices[0] || null;
+    maleVoice = findBy(MALE_PREFS, voices, v => isMale(v) || /male/i.test(v.name)) || voices.find(isMale) || null;
+    renderVoicePicker();
+  }
+  function renderVoicePicker(){
+    const box = document.getElementById('voicePick');
+    if (!box) return;
+    box.innerHTML = `<span class="vlabel" id="vlabel">Voice</span>
+      <div class="seg" role="radiogroup" aria-labelledby="vlabel">
+        <button role="radio" aria-checked="${gender==='female'}" data-g="female">Female</button>
+        <button role="radio" aria-checked="${gender==='male'}" data-g="male">Male</button>
+      </div>`;
+    box.querySelectorAll('.seg button').forEach(b => b.onclick = () => {
+      gender = b.dataset.g;
+      try { localStorage.setItem(VOICE_KEY, gender); } catch(e){}
+      renderVoicePicker();
+      speak('Hello! Tele means far away.');
+    });
+  }
+  if ('speechSynthesis' in window){
+    loadVoices();
+    speechSynthesis.addEventListener ? speechSynthesis.addEventListener('voiceschanged', loadVoices) : (speechSynthesis.onvoiceschanged = loadVoices);
+  } else { renderVoicePicker(); }
+  function speak(text){
+    if (!('speechSynthesis' in window)) { alert('Read aloud is not supported in this browser.'); return; }
+    window.speechSynthesis.cancel();
+    if (!femaleVoice) loadVoices();
+    const u = new SpeechSynthesisUtterance(String(text).replace(/;/g, '.').replace(/,\s*/g, ', '));
+    let v, pitch;
+    if (gender === 'male'){ v = maleVoice || femaleVoice; pitch = maleVoice ? 1 : 0.6; }
+    else { v = femaleVoice; pitch = 1.05; }
+    if (v){ u.voice = v; u.lang = v.lang; } else { u.lang = 'en-US'; }
+    u.rate = 0.8; u.pitch = pitch; u.volume = 1;
+    window.speechSynthesis.speak(u);
+  }
+
+  function renderTitle(){ document.getElementById('deckTitle').innerHTML = esc(deck.title || 'Roots') + '<span>' + deck.cards.length + ' cards</span>'; document.title = (deck.title||'Roots') + ' study games'; }
+
+  // ---------- tabs ----------
+  document.querySelectorAll('nav.tabs button').forEach(b => b.addEventListener('click', () => showTab(b.dataset.tab)));
+  function showTab(name){
+    document.querySelectorAll('nav.tabs button').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === name));
+    ['flash','match','edit'].forEach(id => document.getElementById(id).hidden = id !== name);
+    if ('speechSynthesis' in window) speechSynthesis.cancel();
+    if (name !== 'match') stopClock();
+    if (name === 'flash') renderFlash();
+    if (name === 'match') startMatch();
+    if (name === 'edit') renderEdit();
+  }
+
+  // ---------- flashcards ----------
+  let order = [], idx = 0, flipped = false, meaningFirst = false;
+  function resetOrder(){ order = deck.cards.map((_,i)=>i); idx = 0; flipped = false; }
+  function renderFlash(){
+    const el = document.getElementById('flash');
+    if (!deck.cards.length){ el.innerHTML = '<div class="empty">No cards yet. Add some in <b>Edit words</b>.</div>'; return; }
+    if (order.length !== deck.cards.length) resetOrder();
+    if (idx >= order.length) idx = 0;
+    const c = deck.cards[order[idx]];
+    const frontText = meaningFirst ? c.meaning : c.root;
+    const backText = meaningFirst ? c.root : c.meaning;
+    const frontCls = meaningFirst ? 'meaning' : 'root';
+    const backCls = meaningFirst ? 'root' : 'meaning';
+    el.innerHTML = `
+      <div class="scene">
+        <button class="card ${flipped?'flipped':''}" id="theCard" aria-label="Flashcard. Tap to flip. Showing ${flipped?'back':'front'}.">
+          <div class="face front"><div class="${frontCls}">${esc(frontText)}</div><div class="hint">Tap to flip</div></div>
+          <div class="face back"><div class="${backCls}">${esc(backText)}</div><div class="hint">Tap to flip back</div></div>
+        </button>
+      </div>
+      <div class="count">Card ${idx+1} of ${order.length}</div>
+      <div class="controls">
+        <button class="btn speak" id="sayWord">${SPEAKER}Read word</button>
+        <button class="btn speak" id="sayMeaning">${SPEAKER}Read meaning</button>
+      </div>
+      <div class="controls">
+        <button class="btn" id="prev" ${idx===0?'disabled':''}>Back</button>
+        <button class="btn primary" id="next">${idx===order.length-1?'Start over':'Next card'}</button>
+      </div>
+      <div class="controls">
+        <button class="btn" id="shuf">Shuffle</button>
+        <button class="btn" id="swap">${meaningFirst?'Show root first':'Show meaning first'}</button>
+      </div>`;
+    const card = document.getElementById('theCard');
+    card.onclick = () => { flipped = !flipped; card.classList.toggle('flipped', flipped); card.setAttribute('aria-label', 'Flashcard. Tap to flip. Showing ' + (flipped?'back':'front') + '.'); };
+    document.getElementById('sayWord').onclick = () => speak(c.root);
+    document.getElementById('sayMeaning').onclick = () => speak(c.meaning);
+    document.getElementById('prev').onclick = () => { if (idx>0){ idx--; flipped=false; renderFlash(); } };
+    document.getElementById('next').onclick = () => { idx = (idx+1) % order.length; flipped=false; renderFlash(); };
+    document.getElementById('shuf').onclick = () => { order = shuffle(order); idx=0; flipped=false; renderFlash(); };
+    document.getElementById('swap').onclick = () => { meaningFirst = !meaningFirst; flipped=false; renderFlash(); };
+  }
+  document.addEventListener('keydown', e => {
+    if (document.getElementById('flash').hidden || e.target.tagName === 'INPUT') return;
+    if (e.key === 'ArrowRight') document.getElementById('next')?.click();
+    if (e.key === 'ArrowLeft') document.getElementById('prev')?.click();
+  });
+
+  // ---------- matching ----------
+  let m = {};
+  let readOnTap = true;
+  let clockTimer = null;
+  const BEST_KEY = 'roots-best-times-v1';
+  function deckKey(){ return JSON.stringify(deck.cards.map(c => [c.root, c.meaning])); }
+  function loadBests(){ try { return JSON.parse(localStorage.getItem(BEST_KEY) || '{}') || {}; } catch(e){ return {}; } }
+  function getBest(){ const v = loadBests()[deckKey()]; return typeof v === 'number' ? v : null; }
+  function setBest(ms){ try { const b = loadBests(); b[deckKey()] = ms; localStorage.setItem(BEST_KEY, JSON.stringify(b)); } catch(e){} }
+  function fmt(ms){ if (ms == null) return '--:--'; const t = Math.floor(ms/100); const tenths = t % 10; const sec = Math.floor(t/10); return Math.floor(sec/60) + ':' + String(sec%60).padStart(2,'0') + '.' + tenths; }
+  function stopClock(){ if (clockTimer){ clearInterval(clockTimer); clockTimer = null; } }
+  function startClock(){
+    m.start = performance.now();
+    clockTimer = setInterval(() => { const el = document.getElementById('clockNow'); if (el) el.textContent = fmt(performance.now() - m.start); }, 100);
+  }
+  function currentTime(){ return m.start == null ? 0 : (m.done.size === deck.cards.length ? m.elapsed : performance.now() - m.start); }
+  function startMatch(){
+    const el = document.getElementById('match');
+    if (deck.cards.length < 2){ el.innerHTML = '<div class="empty">Add at least 2 cards in <b>Edit words</b> to play matching.</div>'; return; }
+    const ids = deck.cards.map((_,i)=>i);
+    stopClock();
+    const lastR = m.roots ? m.roots.join() : '', lastM = m.meanings ? m.meanings.join() : '';
+    let roots, meanings, tries = 0;
+    do {
+      roots = shuffle(ids); meanings = shuffle(ids); tries++;
+    } while (tries < 200 && (
+      (ids.length > 2 && (roots.join() === lastR || meanings.join() === lastM)) ||
+      (ids.length > 1 && roots.some((r, k) => meanings[k] === r))
+    ));
+    m = { roots, meanings, selRoot: null, selMeaning: null, done: new Set(), tries: 0, busy: false, start: null, elapsed: 0, newBest: false, prevBest: null };
+    renderMatch();
+  }
+  function renderMatch(){
+    const el = document.getElementById('match');
+    const total = deck.cards.length;
+    const won = m.done.size === total;
+    el.innerHTML = `
+      ${won ? `<div class="win">${m.newBest ? `<p class="record">New best time: ${fmt(m.elapsed)}!</p><p class="sub">${m.prevBest != null ? 'You beat your old time of ' + fmt(m.prevBest) + '.' : 'That is your first record. Now try to beat it!'}</p>` : `<p>You matched all ${total} in ${fmt(m.elapsed)}.</p><p class="sub">Your best is ${fmt(getBest())}. Try again to beat it!</p>`}<p class="sub">It took ${m.tries} tries.</p><button class="btn primary" id="again">Play again</button></div>` : ''}
+      <div class="timer-row">
+        <div class="clock"><small>Time</small><b id="clockNow">${fmt(currentTime())}</b></div>
+        <div class="clock best"><div><small>Best time to beat</small><b>${fmt(getBest())}</b></div><button class="resetBest" id="clearBest" ${getBest() == null ? 'disabled' : ''}>Reset</button></div>
+      </div>
+      <div class="match-bar">
+        <div class="stats">Matched <b>${m.done.size}</b> of ${total} · Tries <b>${m.tries}</b></div>
+        <label class="toggle"><input type="checkbox" id="readTap" ${readOnTap?'checked':''}>Read aloud when I tap</label>
+      </div>
+      <div class="columns">
+        <div class="col"><h2>Root</h2>${m.roots.map(i => tile('r', i)).join('')}</div>
+        <div class="col"><h2>Meaning</h2>${m.meanings.map(i => tile('m', i)).join('')}</div>
+      </div>
+      ${won ? '' : `<p class="stats" style="margin:12px 0 0;text-align:center">${m.start == null ? 'The timer starts on your first tap.' : ''}</p><div class="controls" style="margin-top:10px"><button class="btn" id="restart">Shuffle and restart</button></div>`}`;
+    document.getElementById('readTap').onchange = e => { readOnTap = e.target.checked; };
+    el.querySelectorAll('.tile').forEach(t => t.onclick = () => pick(t.dataset.side, +t.dataset.id));
+    document.getElementById('again')?.addEventListener('click', startMatch);
+    document.getElementById('restart')?.addEventListener('click', startMatch);
+    document.getElementById('clearBest')?.addEventListener('click', () => { if (confirm('Reset the best time for this deck?')) { try { const b = loadBests(); delete b[deckKey()]; localStorage.setItem(BEST_KEY, JSON.stringify(b)); } catch(e){} renderMatch(); } });
+  }
+  function tile(side, i){
+    const c = deck.cards[i];
+    const done = m.done.has(i);
+    const sel = (side==='r' ? m.selRoot : m.selMeaning) === i;
+    return `<button class="tile ${side==='r'?'rootTile':''} ${done?'done':''} ${sel?'selected':''}" data-side="${side}" data-id="${i}" ${done?'disabled aria-disabled="true"':''}>${esc(side==='r'?c.root:c.meaning)}</button>`;
+  }
+  function pick(side, i){
+    if (m.busy || m.done.has(i)) return;
+    if (m.start == null) startClock();
+    const c = deck.cards[i];
+    if (readOnTap) speak(side==='r' ? c.root : c.meaning);
+    if (side==='r') m.selRoot = (m.selRoot===i ? null : i); else m.selMeaning = (m.selMeaning===i ? null : i);
+    if (m.selRoot !== null && m.selMeaning !== null){
+      m.tries++;
+      if (m.selRoot === m.selMeaning){
+        m.done.add(m.selRoot); m.selRoot = m.selMeaning = null;
+        if (m.done.size === deck.cards.length){
+          m.elapsed = performance.now() - m.start; stopClock();
+          const best = getBest(); m.prevBest = best;
+          if (best == null || m.elapsed < best){ m.newBest = true; setBest(m.elapsed); }
+        }
+        renderMatch();
+      } else {
+        const r = m.selRoot, mm = m.selMeaning;
+        renderMatch();
+        m.busy = true;
+        const el = document.getElementById('match');
+        el.querySelector(`.tile[data-side="r"][data-id="${r}"]`)?.classList.add('wrong');
+        el.querySelector(`.tile[data-side="m"][data-id="${mm}"]`)?.classList.add('wrong');
+        setTimeout(() => { m.selRoot = m.selMeaning = null; m.busy = false; renderMatch(); }, 700);
+      }
+      return;
+    }
+    renderMatch();
+  }
+
+  // ---------- editor ----------
+  let draft = null;
+  function renderEdit(){
+    if (!draft) draft = { title: deck.title, cards: deck.cards.map(c => ({...c})) };
+    const el = document.getElementById('edit');
+    el.innerHTML = `
+      <p class="edit-intro">Change any root or meaning, add new cards, then tap Save changes. The flashcards and matching game use the saved list.</p>
+      <label class="field"><span>Deck name</span><input id="titleIn" value="${esc(draft.title)}"></label>
+      <div class="row-head"><div>Root / word</div><div>Meaning</div><div></div></div>
+      <div id="rows">${draft.cards.map((c,i)=>`
+        <div class="row">
+          <input class="r" data-i="${i}" data-k="root" value="${esc(c.root)}" placeholder="Root" aria-label="Root ${i+1}">
+          <input class="m" data-i="${i}" data-k="meaning" value="${esc(c.meaning)}" placeholder="Meaning" aria-label="Meaning ${i+1}">
+          <button class="del" data-i="${i}" aria-label="Delete card ${i+1}">✕</button>
+        </div>`).join('')}</div>
+      <div class="edit-actions">
+        <button class="btn" id="addRow">Add a card</button>
+        <button class="btn primary" id="saveBtn">Save changes</button>
+        <button class="btn" id="undoBtn">Undo edits</button>
+      </div>
+      <div class="status" id="status" role="status"></div>`;
+    document.getElementById('titleIn').oninput = e => draft.title = e.target.value;
+    el.querySelectorAll('#rows input').forEach(inp => inp.oninput = e => { draft.cards[+e.target.dataset.i][e.target.dataset.k] = e.target.value; });
+    el.querySelectorAll('.del').forEach(b => b.onclick = () => { draft.cards.splice(+b.dataset.i, 1); renderEdit(); });
+    document.getElementById('addRow').onclick = () => { draft.cards.push({root:'', meaning:''}); renderEdit(); const ins = el.querySelectorAll('#rows input.r'); ins[ins.length-1]?.focus(); };
+    document.getElementById('undoBtn').onclick = () => { draft = null; renderEdit(); setStatus('Edits undone.'); };
+    document.getElementById('saveBtn').onclick = save;
+  }
+  function setStatus(t){ const s = document.getElementById('status'); if (s) s.textContent = t; }
+
+  let artifactApi = null;
+  if (window.claude && typeof window.claude.use === 'function'){
+    window.claude.use('artifact').then(a => { artifactApi = a; }).catch(() => {});
+  }
+
+  function buildDocument(newDeck){
+    const style = document.getElementById('app-style').textContent;
+    const script = document.getElementById('app-script').textContent;
+    const body = document.querySelector('.wrap').cloneNode(false);
+    const json = JSON.stringify(newDeck).replace(/</g, '\\u003c');
+    return '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n' +
+      '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n' +
+      '<title>' + esc(newDeck.title || 'Roots') + ' study games</title>\n' +
+      '<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n' +
+      '<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700;800&display=swap" rel="stylesheet">\n' +
+      '<style id="app-style">' + style + '</style>\n</head>\n<body>\n' + SHELL + '\n' +
+      '<script type="application/json" id="deck-data">' + json + '<\/script>\n' +
+      '<script id="app-script">' + script + '<\/script>\n</body>\n</html>\n';
+  }
+  const SHELL = `<div class="wrap">
+  <header class="top">
+    <h1 id="deckTitle">Roots</h1>
+    <div class="voice-pick" id="voicePick"></div>
+  </header>
+  <nav class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-tab="flash">Flashcards</button>
+    <button role="tab" aria-selected="false" data-tab="match">Matching</button>
+    <button role="tab" aria-selected="false" data-tab="edit">Edit words</button>
+  </nav>
+  <section id="flash"></section>
+  <section id="match" hidden></section>
+  <section id="edit" hidden></section>
+</div>`;
+
+  async function save(){
+    const cleaned = {
+      title: (draft.title || '').trim() || 'My roots',
+      cards: draft.cards.map(c => ({root:(c.root||'').trim(), meaning:(c.meaning||'').trim()})).filter(c => c.root || c.meaning)
+    };
+    const missing = cleaned.cards.find(c => !c.root || !c.meaning);
+    if (missing){ setStatus('Each card needs both a root and a meaning. Fill in the blank box or delete that card.'); return; }
+    deck = cleaned; draft = null; resetOrder(); renderTitle();
+    try { localStorage.setItem(LS_KEY, JSON.stringify({deck, stamp: 'local'})); } catch(e){}
+    renderEdit();
+    if (artifactApi){
+      setStatus('Saving…');
+      try {
+        await artifactApi.publish(buildDocument(deck));
+        setStatus('Saved. Your changes are now part of this page.');
+      } catch(err){
+        const code = err && err.code;
+        if (code === 'not_writer' || code === 'not_granted') setStatus('Saved on this device only. This page is view-only for you, so edits are not saved to the shared page.');
+        else if (code === 'conflict') setStatus('Someone else saved first. The page is reloading with their version.');
+        else setStatus('Saved on this device only. Saving to the page failed, try Save changes again later.');
+      }
+    } else {
+      setStatus('Saved on this device.');
+    }
+  }
+
+  // Use locally saved edits only when page has no newer published version
+  try {
+    const saved = JSON.parse(localStorage.getItem(LS_KEY) || 'null');
+    if (saved && saved.stamp === 'local' && saved.deck) {
+      // keep published data authoritative once the artifact capability is available
+      setTimeout(() => {
+        if (!artifactApi && saved.deck && JSON.stringify(saved.deck) !== JSON.stringify(deck)) {
+          deck = saved.deck; resetOrder(); renderTitle(); const t = document.querySelector('nav.tabs button[aria-selected="true"]'); showTab(t ? t.dataset.tab : 'flash');
+        }
+      }, 1500);
+    }
+  } catch(e){}
+
+  renderTitle();
+  resetOrder();
+  renderFlash();
+})();
+</script>
+</body>
+</html>
