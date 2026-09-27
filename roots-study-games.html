@@ -189,7 +189,7 @@ section[hidden]{display:none}
   <section id="edit" hidden></section>
 </div>
 
-<script type="application/json" id="deck-data">{"title":"Greek and Latin Roots","cards":[{"root":"tele","meaning":"far away"},{"root":"phono","meaning":"sound, voice"},{"root":"peri","meaning":"around, near"},{"root":"graph, gram","meaning":"to write; or something written"},{"root":"scope","meaning":"watch, view, examine"},{"root":"micro","meaning":"small"},{"root":"geo","meaning":"earth"},{"root":"thermos, therm","meaning":"heat"},{"root":"meter, metry","meaning":"measure"},{"root":"bio","meaning":"life"}]}</script>
+<script type="application/json" id="deck-data">{"title": "Greek and Latin Roots", "cards": [{"root": "log, logue", "meaning": "speech, study of, written work, word"}, {"root": "mono", "meaning": "one, single"}, {"root": "arch", "meaning": "ruler, principal, first"}, {"root": "cracy, crat", "meaning": "rule, government"}, {"root": "the, theo", "meaning": "God, a god"}, {"root": "dia, di", "meaning": "thorough, through, across"}, {"root": "gon", "meaning": "angle"}, {"root": "poly", "meaning": "many"}, {"root": "gamy, gamous", "meaning": "marriage, union"}, {"root": "bi", "meaning": "twice, two"}]}</script>
 
 <script id="app-script">
 (function(){
@@ -251,7 +251,7 @@ section[hidden]{display:none}
       gender = b.dataset.g;
       try { localStorage.setItem(VOICE_KEY, gender); } catch(e){}
       renderVoicePicker();
-      speak('Hello! Tele means far away.');
+      speak('Hello! Mono means one.');
     });
   }
   if ('speechSynthesis' in window){
